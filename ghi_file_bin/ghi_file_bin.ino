@@ -1,67 +1,84 @@
+/*
+ * Connect the pins of the EEPROM 24C64 to the ESP32 as follows:
+ * 24C64  |  ESP32
+ * VCC(8) -> 3.3V
+ * GND(4) -> GND
+ * SCL(6) -> GPIO 22(or any GPIO pin that can be used for I2C)
+ * SDA(5) -> GPIO 21(or any GPIO pin that can be used for I2C)
+ * WP(7)  -> GND (to turn off Write Protect mode, allowing data to be written)
+ * Optional connection to set the I2C address 0x52 
+ * A0(1) -> GND
+ * A1(2) -> 3V3(D2)
+ * A2(3) -> GND
+ */
+
+
 #include <Wire.h>
 #include "SPIFFS.h"
 
-#define EEPROM_BASE_ADDRESS 0x50
+#define EEPROM_BASE_ADDRESS 0x52
 #define PAGE_SIZE 32
 
 // Pin definitions for EEPROM address pins
-#define A0_PIN 25
-#define A1_PIN 26
-#define A2_PIN 27
+#define A1_PIN 2
+
+// Define buttom pin.
+
+#define buttonPin 4
 
 void setup() {
   Serial.begin(115200);
   
+  // Initialize address pins as outputs          
+  pinMode(A1_PIN, OUTPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+  
+  // set the EEPROM address pins
+ 
+  digitalWrite(A1_PIN, HIGH);
+  
   // Initialize I2C
   Wire.begin();
-  
+
   // Initialize SPIFFS
   if (!SPIFFS.begin(true)) {
     Serial.println("An error occurred while mounting SPIFFS");
     return;
   }
 
-  // Initialize address pins as outputs
-  pinMode(A0_PIN, OUTPUT);
-  pinMode(A1_PIN, OUTPUT);
-  pinMode(A2_PIN, OUTPUT);
-
-  // Open the binary file from SPIFFS
-  File file = SPIFFS.open("/test.bin", "r");
-  if (!file) {
-    Serial.println("Failed to open file for reading");
-    return;
-  }
-
-  // Get the file size
-  size_t fileSize = file.size();
-  Serial.print("File size: ");
-  Serial.println(fileSize);
-
-  uint8_t buffer[PAGE_SIZE];
-  uint16_t address = 0;
-
-  // Write data to EEPROM
-  while (file.available()) {
-    size_t bytesRead = file.read(buffer, PAGE_SIZE);
-    writeEEPROM(EEPROM_BASE_ADDRESS, address, buffer, bytesRead);
-    address += bytesRead;
-    delay(10); // Ensure the write cycle completes
-  }
-
-  file.close();
-  Serial.println("File write completed");
 }
 
 void loop() {
-  // Nothing to do here
-}
+  if (digitalRead(buttonPin) == LOW) {
+    delay(1000);
+    // Open the binary file from SPIFFS
+    File file = SPIFFS.open("/test.bin", "r");
+    if (!file) {
+       Serial.println("Failed to open file for reading");
+      return;
+    }
+   
+    // Get the file size
+    size_t fileSize = file.size();
+    Serial.print("File size: ");
+    Serial.println(fileSize);
 
-// Function to set the EEPROM address pins
-void setEEPROMAddress(uint8_t address) {
-  digitalWrite(A0_PIN, (address & 0x01) ? HIGH : LOW);
-  digitalWrite(A1_PIN, (address & 0x02) ? HIGH : LOW);
-  digitalWrite(A2_PIN, (address & 0x04) ? HIGH : LOW);
+    uint8_t buffer[PAGE_SIZE];
+    uint16_t address = 0;
+
+    Serial.println("Start the file recording process");
+    
+    // Write data to EEPROM
+    while (file.available()) {
+      size_t bytesRead = file.read(buffer, PAGE_SIZE);
+      writeEEPROM(EEPROM_BASE_ADDRESS, address, buffer, bytesRead);
+      address += bytesRead;
+      delay(10); // Ensure the write cycle completes
+    }
+
+    file.close();
+    Serial.println("File write successfull");
+    }
 }
 
 // Function to write data to EEPROM
