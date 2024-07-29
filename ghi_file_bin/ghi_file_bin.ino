@@ -8,8 +8,9 @@
  * WP(7)  -> GND (to turn off Write Protect mode, allowing data to be written)
  * Optional connection to set the I2C address 0x52 
  * A0(1) -> GND
- * A1(2) -> 3V3(D2)
+ * A1(2) -> 3V3
  * A2(3) -> GND
+ * GND -> Buttom pin 1 | Buttom pin 2 -> GPIO4
  */
 
 
@@ -19,23 +20,13 @@
 #define EEPROM_BASE_ADDRESS 0x52
 #define PAGE_SIZE 32
 
-// Pin definitions for EEPROM address pins
-#define A1_PIN 2
-
 // Define buttom pin.
 
 #define buttonPin 4
 
 void setup() {
   Serial.begin(115200);
-  
-  // Initialize address pins as outputs          
-  pinMode(A1_PIN, OUTPUT);
   pinMode(buttonPin, INPUT_PULLUP);
-  
-  // set the EEPROM address pins
- 
-  digitalWrite(A1_PIN, HIGH);
   
   // Initialize I2C
   Wire.begin();
@@ -49,6 +40,7 @@ void setup() {
 }
 
 void loop() {
+  //Serial.println(digitalRead(buttonPin));
   if (digitalRead(buttonPin) == LOW) {
     delay(1000);
     // Open the binary file from SPIFFS
@@ -93,20 +85,4 @@ void writeEEPROM(uint8_t i2cAddress, uint16_t memoryAddress, uint8_t* data, size
 
   Wire.endTransmission();
   delay(5); // Wait for write cycle to complete
-}
-
-// Function to read data from EEPROM
-void readEEPROM(uint8_t i2cAddress, uint16_t memoryAddress, uint8_t* buffer, size_t length) {
-  Wire.beginTransmission(i2cAddress);
-  Wire.write((memoryAddress >> 8) & 0xFF); // MSB
-  Wire.write(memoryAddress & 0xFF);        // LSB
-  Wire.endTransmission();
-
-  Wire.requestFrom(i2cAddress, length);
-
-  for (size_t i = 0; i < length; i++) {
-    if (Wire.available()) {
-      buffer[i] = Wire.read();
-    }
-  }
 }
