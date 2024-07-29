@@ -21,7 +21,6 @@
 #define PAGE_SIZE 32
 
 // Define buttom pin.
-
 #define buttonPin 4
 
 void setup() {
@@ -36,7 +35,6 @@ void setup() {
     Serial.println("An error occurred while mounting SPIFFS");
     return;
   }
-
 }
 
 void loop() {
@@ -67,7 +65,6 @@ void loop() {
       address += bytesRead;
       delay(10); // Ensure the write cycle completes
     }
-
     file.close();
     Serial.println("File write successfull");
     }
@@ -82,7 +79,6 @@ void writeEEPROM(uint8_t i2cAddress, uint16_t memoryAddress, uint8_t* data, size
   for (size_t i = 0; i < length; i++) {
     Wire.write(data[i]);
   }
-
   Wire.endTransmission();
   delay(5); // Wait for write cycle to complete
 }
