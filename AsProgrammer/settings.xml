@@ -2,5 +2,5 @@
 <settings>
   <locale lang="en"/>
   <options hw="ch341a" CHIP="_24C64" clear="0" skipff="1" unprot="0" verify="0" busyskip="0" mw_speed="32Khz" spi_speed="1_5Mhz" blankcheck="0" LoadLastDev="1" arduino_comport="" arduino_baudrate="1000000"/>
-  <Windows DPI="120" Top="126" Left="819" LogH="485" Width="956" Height="1006"/>
+  <Windows DPI="120" Top="43" Left="972" LogH="167" Width="956" Height="995"/>
 </settings>
