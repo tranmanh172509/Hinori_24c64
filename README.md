@@ -13,9 +13,11 @@
 	+ Lấy đường dẫn Arduino đang được cài đặt trên máy.
 	+ FIle -> Preferences
 	
-![](layduongdan.png)
+
 
 	+ Dán thư mục vừa giải nén vào vị thư mục ** Tools** của Arduino.
+	
+![](layduongdan.png)
 	
 ![](ganvaotool.png)
 	
