@@ -10,7 +10,8 @@
  * A0(1) -> GND
  * A1(2) -> 3V3
  * A2(3) -> GND
- * GND -> Buttom pin 1 | Buttom pin 2 -> GPIO4
+ * GND -> Buttom pin 1 | Buttom pin 2 -> GPIO 4
+ * GND -> Buzzer pin 1 | Buzzer pin 2 -> GPIO 12
  */
 
 
@@ -23,9 +24,12 @@
 // Define buttom pin.
 #define buttonPin 4
 
+// Define Buzzer pin.
+int buzzerPin = 12;
 void setup() {
   Serial.begin(115200);
   pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buzzerPin, OUTPUT);
   
   // Initialize I2C
   Wire.begin();
@@ -40,11 +44,32 @@ void setup() {
 void loop() {
   //Serial.println(digitalRead(buttonPin));
   if (digitalRead(buttonPin) == LOW) {
-    delay(1000);
+    int foundDevice = 0;
+    for (byte address = 1; address < 127; address++) {
+      Wire.beginTransmission(address);
+      if (Wire.endTransmission() == 0) {
+        Serial.print("I2C device found at address 0x");
+        if (address < 16) Serial.print("0");
+        Serial.println(address, HEX);
+
+      // Kiểm tra nếu địa chỉ là 0x52
+        if (address == 0x52) {
+          Serial.println("EEPROM 24C64 detected at 0x52.");
+          foundDevice = 1;
+          break;
+        }
+      }
+    }
+    if (foundDevice == 0) {
+      Serial.println("Error: EEPROM 24C64 not found at address 0x52.");
+      alarmSound();  // Play alarm sound
+      return;
+    }
     // Open the binary file from SPIFFS
     File file = SPIFFS.open("/test.bin", "r");
     if (!file) {
        Serial.println("Failed to open file for reading");
+       alarmSound(); // Play alarm sound
       return;
     }
    
@@ -67,7 +92,36 @@ void loop() {
     }
     file.close();
     Serial.println("File write successfull");
+    successSound();
     }
+}
+
+// Function alarm sound
+void alarmSound() {
+  for (int freq = 500; freq <= 2000; freq += 50) {
+    tone(buzzerPin, freq);
+    delay(50);
+  }
+
+  for (int freq = 2000; freq >= 500; freq -= 50) {
+    tone(buzzerPin, freq);
+    delay(50);
+  }
+
+  noTone(buzzerPin);
+}
+
+// Play success sound
+void successSound() {
+  // Play a series of increasing tones for a "success" sound
+  tone(buzzerPin, 500);  // Play sound at 500 Hz
+  delay(200);
+  tone(buzzerPin, 700);  // Play sound at 700 Hz
+  delay(200);
+  tone(buzzerPin, 900);  // Play sound at 900 Hz
+  delay(200);
+
+  noTone(buzzerPin);  // Turn off sound
 }
 
 // Function to write data to EEPROM
