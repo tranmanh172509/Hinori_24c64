@@ -11,6 +11,7 @@
 
 - B3 Cài đặt.
 	+ Lấy đường dẫn Arduino đang được cài đặt trên máy.
+	+ FIle -> Preferences
 	
 ![](layduongdan.png)
 
