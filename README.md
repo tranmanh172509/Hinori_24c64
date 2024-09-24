@@ -8,12 +8,18 @@
 	+ Link tải: [ESP32FS]()
 	
 - B2 Giải nén:
-	+ Sau khi gải nén ta được một thư mục như sau:
-
-<p style="text-align: center;">  
-	<img src="" width="650" height="auto" alt="ảnh báo cáo">
-</p>
 
 - B3 Cài đặt.
+	+ Lấy đường dẫn Arduino đang được cài đặt trên máy.
+	+ Dán thư mục vừa giải nén vào vị thư mục ** Tools** của Arduino.
+	
+### 2. Upload file HEX cần nạp vào ROM của ESP32.
+- B1 Mở File code đã có sẵn.
+- B2 Chọn Tool -> ESP32 Sketch Data Upload.
+- B3 Nạp code cho ESP32.
+
+
+
+
 
 	
